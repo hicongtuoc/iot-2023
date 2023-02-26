@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Garden</title>
+
+  <link rel="stylesheet" href="toast.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+    integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA=="
+    crossorigin="anonymous" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+  <script src="jquery.js"></script>
+  <script src="socket.io/socket.io.js"></script>
+  <!-- <script src="export-data.js"></script>
+    <script src="accessibility.js"></script> -->
+  <script defer src="xuly.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+    crossorigin="anonymous"></script>
+
+  <style>
+    .page-wrapper {
+      /* height: 100%; */
+      width: 100%;
+    }
+
+    .background-page {
+      background: linear-gradient(252.44deg,
+          #174386 1.12%,
+          #16274d 23.43%,
+          #16274d 71.62%,
+          #174386 96.77%);
+    }
+
+    .header-page {
+      margin-top: 1rem;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .header-page .title {
+      font-weight: 700;
+      font-size: 46px;
+      line-height: 75px;
+      color: #ffffff;
+    }
+
+    .messenger-wrapper {
+      width: 100%;
+      display: flex;
+      align-items: flex-start;
+      padding-left: 1rem;
+    }
+
+    .messenger-wrapper .img-messenger {
+      width: 50px;
+    }
+
+    .messenger-wrapper .messenger-title {
+      font-weight: 600;
+      font-size: 28px;
+      line-height: 42px;
+      color: #ffffff;
+    }
+
+    .listCard-wrapper {
+      width: 100%;
+      padding: 1rem 0;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(100px, 1fr));
+      grid-row-gap: 6px;
+      grid-column-gap: 8px;
+    }
+
+    .listCard-wrapper .card-item {
+      width: 226px;
+      height: 376px;
+      background: linear-gradient(180deg, #02b9f6 0%, #1460dc 100%);
+      box-shadow: 3px 4px 22px rgba(255, 255, 255, 0.13);
+      border-radius: 42px;
+      position: relative;
+    }
+
+    .card-item .value {
+      font-weight: 700;
+      font-size: 36px;
+      line-height: 56px;
+      color: #ffffff;
+      position: absolute;
+      top: 5px;
+      left: 26px;
+    }
+
+    .card-item .image {
+      position: absolute;
+      left: 0;
+      top: 48px;
+    }
+
+    .card-item .title {
+      font-weight: 700;
+      font-size: 36px;
+      line-height: 42px;
+      color: #ffffff;
+      position: absolute;
+      bottom: 18px;
+      left: 26px;
+    }
+
+    .img-icon {
+      width: 246px;
+    }
+
+    .footer-page {
+      width: 100%;
+    }
+
+    @media only screen and (min-width: 300px) {
+      .header-page .title {
+        font-size: 24px;
+      }
+
+      .listCard-wrapper .card-item {
+        width: 175px;
+        height: 282px;
+      }
+
+      .card-item .value {
+        font-size: 26px;
+      }
+
+      .card-item .title {
+        font-size: 24px;
+      }
+
+      .img-icon {
+        width: 178px;
+      }
+
+      /* .messenger-wrapper .img-messenger {
+        width: 38px;
+      } */
+
+      .listCard-wrapper {
+        width: 100%;
+        padding: 1rem 0;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(100px, 1fr));
+        grid-row-gap: 16px;
+        grid-column-gap: 8px;
+        padding-left: 1rem;
+      }
+    }
+
+    @media only screen and (min-width: 600px) {
+      .listCard-wrapper {
+        grid-template-columns: repeat(3, minmax(100px, 1fr));
+        justify-items: center;
+        align-items: center;
+        padding-left: 1rem;
+      }
+    }
+
+    @media only screen and (min-width: 1200px) {
+      .listCard-wrapper {
+        grid-template-columns: repeat(5, minmax(100px, 1fr));
+        justify-items: center;
+        align-items: center;
+        padding-left: 1rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="toast"></div>
+  <div class="page-wrapper background-page">
+    <div class="header-page">
+      <p class="title">Giám sát nhiệt độ, độ ẩm phòng</p>
+    </div>
+    <div class="messenger-wrapper">
+      <img class="img-messenger" src="/imgs/gmail.png" />
+      <div>
+        <div id="messengerTemperature" class="messenger-title"></div>
+        <div id="messengerDust" class="messenger-title"></div>
+        <div id="messengerLight" class="messenger-title"></div>
+        <div id="messengergas" class="messenger-title"></div>
+      </div>
+    </div>
+    <div class="listCard-wrapper">
+      <div class="card-item">
+        <div id="currentTemperature" class="value">0°C</div>
+        <div class="image">
+          <img class="img-icon" src="/imgs/tem.png" />
+        </div>
+        <div class="title">Nhiệt độ</div>
+      </div>
+      <div class="card-item">
+        <div id="currentHumidity" class="value">0%</div>
+        <div class="image">
+          <img class="img-icon" src="/imgs/doam.png" />
+        </div>
+        <div class="title">Độ ẩm</div>
+      </div>
+      <div class="card-item">
+        <div id="currentGa" class="value">0</div>
+        <div class="image">
+          <img class="img-icon" src="/imgs/gas.png" />
+        </div>
+        <div class="title">Khí ga</div>
+      </div>
+      <div class="card-item">
+        <div id="currentLight" class="value">0 Lux</div>
+        <div class="image">
+          <img class="img-icon" src="/imgs/anhsang.png" />
+        </div>
+        <div class="title">Ánh sáng</div>
+      </div>
+      <div class="card-item">
+        <div id="currentDust" class="value">0 ug/m³</div>
+        <div class="image">
+          <img class="img-icon" src="/imgs/dust.png" />
+        </div>
+        <div class="title">Bụi</div>
+      </div>
+    </div>
+    <div class="footer-page">
+      <img src="/imgs/newsletter.png" />
+    </div>
+  </div>
+</body>
+
+</html>
